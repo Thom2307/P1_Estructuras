@@ -1,0 +1,5 @@
+package co.edu.uniquindio.poo.util;
+
+public class ComparadorTiempo {
+
+}
