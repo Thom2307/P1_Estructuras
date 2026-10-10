@@ -1,4 +1,15 @@
 package co.edu.uniquindio.poo.estructuras;
 
-public class ColeccionGenerica {
+// Usamos <T> para que sea genérica
+public interface ColeccionGenerica<T> extends Iterable<T> {
+
+    void agregar(T elemento);
+
+    boolean eliminar(T elemento);
+
+    T obtener(int posicion);
+
+    int getTamaño();
+
+    boolean estaVacia();
 }
