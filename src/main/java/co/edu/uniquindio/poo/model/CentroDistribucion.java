@@ -68,7 +68,6 @@ public class CentroDistribucion {
     // --- REQUERIMIENTOS DE MUNICIPIOS ---
 
     //Retorna los municipios que tienen paquetes registrados, ordenados alfabéticamente.
-
     public Set<String> getMunicipiosConPaquetes() {
         // TreeSet elimina duplicados automáticamente y los ordena alfabéticamente
         return new TreeSet<>(paquetesPorMunicipio.keySet());
@@ -81,7 +80,6 @@ public class CentroDistribucion {
     // --- REQUERIMIENTOS DE DESPACHO E HISTORIAL ---
 
     //Retorna y remueve el siguiente paquete según orden de llegada.
-
     public Paquete despacharPorOrdenLlegada() {
         Paquete p = colaLlegada.poll();
         if (p != null) colaPrioridad.remove(p); // Lo sacamos de la otra cola para sincronizar
@@ -89,7 +87,6 @@ public class CentroDistribucion {
     }
 
     //Retorna y remueve el siguiente paquete según reglas de prioridad.
-
     public Paquete despacharPorPrioridad() {
         Paquete p = colaPrioridad.poll();
         if (p != null) colaLlegada.remove(p); // Lo sacamos de la otra cola para sincronizar
@@ -97,7 +94,6 @@ public class CentroDistribucion {
     }
 
     //Marca un paquete como entregado y lo añade al historial propio.
-
     public void registrarEntrega(Paquete paquete, Repartidor repartidor) {
         if (!repartidor.isDisponible()) {
             throw new IllegalStateException("El repartidor no está disponible.");
@@ -121,4 +117,117 @@ public class CentroDistribucion {
     public Collection<Paquete> getTodosLosPaquetes() {
         return registroPaquetes.values();
     }
+
+
+    // ==========================================
+    //        ALGORITMOS RECURSIVOS
+    // ==========================================
+
+    //1. Determinar el peso total de los paquetes destinados a un municipio (Wrapper)
+    public double calcularPesoTotalPorMunicipio(List<Paquete> paquetes, String municipio) {
+        if (paquetes == null || paquetes.isEmpty()) return 0.0;
+        return calcularPesoRecursivo(paquetes, municipio, 0);
+    }
+
+    // Metodo recursivo real (privado)
+    private double calcularPesoRecursivo(List<Paquete> paquetes, String municipio, int indice) {
+        // Caso base: llegamos al final de la lista
+        if (indice == paquetes.size()) {
+            return 0.0;
+        }
+
+        // Caso recursivo: avanzamos sumando o no dependiendo del municipio
+        Paquete actual = paquetes.get(indice);
+        double pesoSumar = actual.getDestino().equals(municipio) ? actual.getPeso() : 0.0;
+
+        return pesoSumar + calcularPesoRecursivo(paquetes, municipio, indice + 1);
+    }
+
+    /**
+     * 2. Determinar cuántos paquetes poseen una prioridad igual o superior (Wrapper)
+     */
+    public int contarPaquetesPorPrioridadMinima(List<Paquete> paquetes, int prioridadMin) {
+        if (paquetes == null || paquetes.isEmpty()) return 0;
+        return contarPrioridadRecursivo(paquetes, prioridadMin, 0);
+    }
+
+    // Metodo recursivo real (privado)
+    private int contarPrioridadRecursivo(List<Paquete> paquetes, int prioridadMin, int indice) {
+        // Caso base: llegamos al final
+        if (indice == paquetes.size()) {
+            return 0;
+        }
+
+        // Caso recursivo
+        int contar = paquetes.get(indice).getPrioridad() >= prioridadMin ? 1 : 0;
+
+        return contar + contarPrioridadRecursivo(paquetes, prioridadMin, indice + 1);
+    }
+
+
+    // ==========================================
+    //        ALGORITMO DE BÚSQUEDA BINARIA
+    // ==========================================
+
+    /**
+     * Busca un paquete por código en una lista previamente ordenada por código.
+     * Precondición: La lista DEBE estar ordenada por código de menor a mayor.
+     */
+    public Paquete busquedaBinariaPorCodigo(List<Paquete> paquetesOrdenados, String codigoBuscado) {
+        int inicio = 0;
+        int fin = paquetesOrdenados.size() - 1;
+
+        while (inicio <= fin) {
+            int medio = inicio + (fin - inicio) / 2;
+            Paquete paqueteMedio = paquetesOrdenados.get(medio);
+
+            int comparacion = paqueteMedio.getCodigo().compareTo(codigoBuscado);
+
+            if (comparacion == 0) {
+                return paqueteMedio; // ¡Encontrado!
+            }
+            if (comparacion < 0) {
+                inicio = medio + 1; // Buscar en la mitad derecha
+            } else {
+                fin = medio - 1; // Buscar en la mitad izquierda
+            }
+        }
+        return null; // No se encontró
+    }
+
+
+    // ==========================================
+    //        ALGORITMO DIVIDE Y VENCERÁS
+    // ==========================================
+
+    /**
+     * Determina el paquete de mayor peso dentro de un conjunto (Wrapper).
+     */
+    public Paquete obtenerPaqueteMasPesado(List<Paquete> paquetes) {
+        if (paquetes == null || paquetes.isEmpty()) return null;
+        return divideYVencerasMayorPeso(paquetes, 0, paquetes.size() - 1);
+    }
+
+    // Metodo real Divide y Vencerás
+    private Paquete divideYVencerasMayorPeso(List<Paquete> paquetes, int inicio, int fin) {
+        // 1. Caso Base: Si solo hay un elemento, ese es el más pesado
+        if (inicio == fin) {
+            return paquetes.get(inicio);
+        }
+
+        // 2. División del problema: Encontramos la mitad
+        int mitad = inicio + (fin - inicio) / 2;
+
+        // 3. Subproblema izquierdo y 4. Subproblema derecho (Llamadas recursivas)
+        Paquete masPesadoIzq = divideYVencerasMayorPeso(paquetes, inicio, mitad);
+        Paquete masPesadoDer = divideYVencerasMayorPeso(paquetes, mitad + 1, fin);
+
+        // 5. Combinación de resultados y 6. Resultado final: Comparar ambos y devolver el mayor
+        if (masPesadoIzq.getPeso() > masPesadoDer.getPeso()) {
+            return masPesadoIzq;
+        } else {
+            return masPesadoDer;
+        }
+    }
+
 }
