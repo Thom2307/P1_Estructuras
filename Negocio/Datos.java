@@ -12,7 +12,7 @@ public class Datos {
     private Datos() {}
 
     public static void cargarPaquetesPrueba(GestorDistribucion gestor) {
-        Random random = new Random(42);
+        Random random = new Random();
         String[] municipios = {"Armenia", "Calarca", "Salento", "Montenegro", "Quimbaya", "Circasia", "La Tebaida"};
 
         // Genera 30 paquetes con codigos unicos de PQ001 a PQ030
