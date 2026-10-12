@@ -46,8 +46,10 @@ public class Main {
         cd.registrarEntrega(pLlegada, repartidorSimulado1);
         cd.registrarEntrega(pPrioridad1, repartidorSimulado2);
 
+        // CORRECCIÓN DEL HISTORIAL (Usando la estructura propia sin iteradores)
         System.out.println("historial de entregas:");
-        for (Paquete entregado : cd.getHistorialEntregas()) {
+        for (int i = 0; i < cd.getHistorialEntregas().getTamaño(); i++) {
+            Paquete entregado = cd.getHistorialEntregas().obtener(i);
             System.out.print(entregado.getCodigo() + " \n");
         }
         System.out.println();
