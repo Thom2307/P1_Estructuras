@@ -1,6 +1,5 @@
 package Negocio;
 
-
 import Algoritmos.ComparadorPrioridad;
 import Algoritmos.ComparadorTiempo;
 import Estructuras.ListaSimplementeEnlazada;
@@ -109,7 +108,9 @@ public class GestorDistribucion {
     }
 
     public void mostrarHistorial() {
-        for (Paquete paquete : historialEntregas) {
+        // Recorrido clásico adaptado a tu lista propia sin iteradores
+        for (int i = 0; i < historialEntregas.getTamaño(); i++) {
+            Paquete paquete = historialEntregas.obtener(i);
             System.out.println("  - " + paquete);
         }
     }

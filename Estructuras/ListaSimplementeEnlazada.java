@@ -1,10 +1,11 @@
 package Estructuras;
 
-import java.util.Iterator;
-
 /**
- * Implementación propia de una lista simplemente enlazada para el almacenamiento interno.
+ * Implementación propia de una lista simplemente enlazada para el proyecto/parcial,
+ * basada en el modelo académico de nodos, sin usar iteradores.
+ * 
  */
+
 public class ListaSimplementeEnlazada<T> implements Coleccion<T> {
     private Nodo<T> cabeza;
     private Nodo<T> cola;
@@ -35,15 +36,17 @@ public class ListaSimplementeEnlazada<T> implements Coleccion<T> {
             return false;
         }
 
+        // Caso: El elemento a eliminar está en la cabeza
         if (cabeza.getValor().equals(elemento)) {
             cabeza = cabeza.getSiguiente();
             if (cabeza == null) {
-                cola = null;
+                cola = null; // Si la lista queda vacía
             }
             tamaño--;
             return true;
         }
 
+        // Caso: El elemento está en el medio o al final
         Nodo<T> actual = cabeza;
         while (actual.getSiguiente() != null && !actual.getSiguiente().getValor().equals(elemento)) {
             actual = actual.getSiguiente();
@@ -52,11 +55,12 @@ public class ListaSimplementeEnlazada<T> implements Coleccion<T> {
         if (actual.getSiguiente() != null) {
             actual.setSiguiente(actual.getSiguiente().getSiguiente());
             if (actual.getSiguiente() == null) {
-                cola = actual;
+                cola = actual; // Si eliminamos la cola, actualizamos el puntero cola
             }
             tamaño--;
             return true;
         }
+
         return false;
     }
 
@@ -82,8 +86,14 @@ public class ListaSimplementeEnlazada<T> implements Coleccion<T> {
         return cabeza == null;
     }
 
-    @Override
-    public Iterator<T> iterator() {
-        return new IteradorListaSimple<>(cabeza);
+    // Métodos de recorrido clásico estilo académico (similares a los de tu modelo base)
+
+    public void imprimir() {
+        Nodo<T> actual = cabeza;
+        while (actual != null) {
+            System.out.print(actual.getValor() + " -> ");
+            actual = actual.getSiguiente();
+        }
+        System.out.println("null");
     }
 }
